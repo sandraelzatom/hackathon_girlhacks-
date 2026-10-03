@@ -12,7 +12,7 @@
 const CONFIG = window.APP_CONFIG || {};
 
 // Model name comes from config.js; falls back to the default below
-const GEMINI_MODEL = CONFIG.model || "gemini-3.8-flash";
+const GEMINI_MODEL = CONFIG.model || "gemini-2.5-flash";
 
 // Optional backend proxy URL (see server.js). Empty string = call Gemini directly.
 const PROXY_URL = (CONFIG.proxyUrl || "").trim();
@@ -50,11 +50,37 @@ function loadState() {
 
 let appState = loadState();
 
+// Save locally (as a cache) and schedule an upload to the server
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
   } catch (err) {
     console.warn("Failed to save state:", err);
+  }
+  scheduleServerSync();
+}
+
+// Debounced upload: many quick changes result in a single request
+let syncTimer = null;
+let serverSyncEnabled = false; // becomes true after GroveLogic.init() succeeds
+
+function scheduleServerSync() {
+  if (!serverSyncEnabled) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushStateToServer, 500);
+}
+
+async function pushStateToServer() {
+  try {
+    const res = await fetch("/api/state", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ state: appState }),
+      keepalive: true // lets the request finish even if the tab is closing
+    });
+    if (res.status === 401) window.location.href = "/login.html"; // session expired
+  } catch (err) {
+    console.warn("Failed to sync progress to the server:", err);
   }
 }
 
@@ -133,6 +159,55 @@ function validateQuizResult(result) {
 window.GroveLogic = {
   /** Get the current global state. */
   getState: () => appState,
+
+  /**
+   * Call this ONCE after the page loads and BEFORE rendering the UI.
+   * Loads the logged-in user's saved progress from the server.
+   * Redirects to the login page if the user is not logged in.
+   */
+  init: async () => {
+    try {
+      const res = await fetch("/api/state");
+      if (res.status === 401) {
+        window.location.href = "/login.html";
+        return appState;
+      }
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      const { state } = await res.json();
+      // New account: start from defaults instead of inheriting another user's local cache
+      appState = state || structuredClone(defaultData);
+      serverSyncEnabled = true;
+      saveState(); // refreshes the local cache (and uploads defaults for a new account)
+    } catch (err) {
+      // Server unreachable: keep working locally without syncing
+      console.warn("Could not load progress from the server, using local data:", err);
+    }
+    return appState;
+  },
+
+  /** Returns the logged-in user ({ username }) or null if not logged in. */
+  getCurrentUser: async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) return null;
+      return (await res.json()).user;
+    } catch (err) {
+      return null;
+    }
+  },
+
+  /** Log out and go back to the login page. */
+  logout: async () => {
+    try {
+      if (serverSyncEnabled) await pushStateToServer(); // make sure the latest progress is saved
+      serverSyncEnabled = false;
+      await fetch("/api/auth/logout", { method: "POST" });
+      try { localStorage.removeItem(STORAGE_KEY); } catch (err) { /* ignore */ }
+    } finally {
+      window.location.href = "/login.html";
+    }
+  },
 
   /** Add points (Starlight Dew) and persist them. */
   addDew: (amount) => {
@@ -257,6 +332,10 @@ window.GroveLogic = {
       throw new Error(`Network error: ${err.message}`);
     } finally {
       clearTimeout(timer);
+    }
+
+    if (response.status === 401) {
+      throw new Error("Please log in first.");
     }
 
     if (!response.ok) {

@@ -1,11 +1,12 @@
 // ==========================================
-// server.js - OPTIONAL tiny proxy that keeps the API key on the server.
-// Run with:  npm install express cors
-//            node --env-file=.env server.js      (Node 20.6+)
+// server.js - Express server: login + Gemini proxy + static pages.
+// Run with:  npm install
+//            npm start        (uses: node --env-file=.env server.js, Node 20.6+)
 // ==========================================
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const { sessionMiddleware, authRouter, stateRouter, requireAuth, requirePage } = require("./auth");
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
@@ -18,22 +19,35 @@ if (!API_KEY) {
 
 const app = express();
 
-// 【需要你改】部署后把 origin 改成你的前端网址，例如 "https://yourname.github.io"
-// 本地开发时允许所有来源即可
+// Pages and API are served from the same origin, so CORS is not really needed locally.
+// 【需要你改】如果以后前端和后端分开部署，把 origin 改成你的前端网址，并开启 credentials
 app.use(cors({ origin: "*" }));
-app.use(express.json({ limit: "25mb" }));
+app.use(sessionMiddleware);
 
-// Serve ONLY an allowlist of front-end files (never the whole folder,
-// otherwise .env and server.js would be downloadable).
-const PUBLIC_FILES = ["test.html", "index.html", "style.css", "logic.js", "config.js"];
+// ---------- Auth routes (small body limit, they only carry a username and password) ----------
+app.use("/api/auth", express.json({ limit: "10kb" }), authRouter);
+
+// ---------- Per-user game progress (login required) ----------
+app.use("/api/state", express.json({ limit: "100kb" }), stateRouter);
+
+// ---------- Static files ----------
+// Only an allowlist is served; never the whole folder (that would expose .env and server.js).
+// These files contain no secrets, so they are public.
+const PUBLIC_FILES = ["login.html", "test.html", "style.css", "logic.js", "config.js"];
 PUBLIC_FILES.forEach((name) => {
   app.get(`/${name}`, (req, res) => res.sendFile(path.join(__dirname, name)));
 });
 
-// Health check: confirms the server is up and the key is loaded (the key itself is never returned)
+// The main app page requires login
+app.get(["/", "/index.html"], requirePage, (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// Health check: the key itself is never returned
 app.get("/health", (req, res) => res.json({ ok: true, model: MODEL, keyLoaded: Boolean(API_KEY) }));
 
-app.post("/api/gemini", async (req, res) => {
+// ---------- Gemini proxy (login required, so strangers cannot use your key) ----------
+app.post("/api/gemini", requireAuth, express.json({ limit: "25mb" }), async (req, res) => {
   try {
     const { contents, generationConfig } = req.body || {};
     if (!Array.isArray(contents)) {
@@ -55,4 +69,4 @@ app.post("/api/gemini", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Proxy running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
