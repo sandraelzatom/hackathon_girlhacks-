@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The Enchanted Grove</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="fireflyCanvas"></canvas>
+
+  <header class="header">
+    <h1>🌿 The Enchanted Grove 🌿</h1>
+    <p>Turn your knowledge into light. Leave blessings on the Memory Tree.</p>
+  </header>
+
+  <main class="main-layout">
+    <!-- Quiz Section -->
+    <section class="card quiz-section">
+      <h2>The Grove of Trials</h2>
+      <p class="section-subtitle">
+        Answer enchanted questions to earn <span class="highlight">Starlight Dew</span>.
+      </p>
+
+      <div id="quizContainer"></div>
+      <p id="quizScore" class="score-text">Starlight Dew: 0</p>
+    </section>
+
+    <!-- Memory Tree Section -->
+    <section class="card tree-section">
+      <h2>The Memory Tree</h2>
+      <p class="section-subtitle">
+        Read whispers from other travelers and hang your own blessing.
+      </p>
+
+      <div class="tree-wrapper">
+        <div class="tree-trunk"></div>
+        <div id="fruitContainer"></div>
+      </div>
+
+      <div class="note-form">
+        <input id="noteInput" type="text" placeholder="Leave a blessing..." />
+        <button id="addNoteBtn">Hang Blessing</button>
+      </div>
+
+      <div id="noteModal" class="modal hidden">
+        <div class="modal-content">
+          <p id="modalText"></p>
+          <button id="closeModalBtn">Close</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built for Hackathon • Enchanted Grove Theme • Study, Support & Magic</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
