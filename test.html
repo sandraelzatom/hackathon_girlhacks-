@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Grove Proxy Test</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    button { padding: 8px 16px; margin-top: 8px; }
+    pre { background: #f4f4f4; padding: 12px; border-radius: 8px; white-space: pre-wrap; }
+    .ok { color: #1a7f37; } .err { color: #cf222e; }
+  </style>
+</head>
+<body>
+  <h2>Gemini Proxy Test</h2>
+  <p id="status">Checking server...</p>
+
+  <input type="file" id="file" accept=".pdf,.txt,.png,.jpg,.jpeg" />
+  <br />
+  <button id="run">Analyze &amp; generate quiz</button>
+  <button id="fallback">Test fallback data</button>
+
+  <h3>Result</h3>
+  <pre id="out">Nothing yet.</pre>
+
+  <!-- config.js must load before logic.js -->
+  <script src="config.js"></script>
+  <script src="logic.js"></script>
+  <script>
+    const out = document.getElementById("out");
+    const status = document.getElementById("status");
+
+    // Check the proxy is reachable and has a key loaded
+    fetch("/health").then(r => r.json()).then(h => {
+      status.innerHTML = h.keyLoaded
+        ? `<span class="ok">Server OK. Model: ${h.model}</span>`
+        : `<span class="err">Server is running but has no API key (check .env).</span>`;
+    }).catch(() => {
+      status.innerHTML = `<span class="err">Cannot reach the server. Did you run npm start?</span>`;
+    });
+
+    document.getElementById("run").onclick = async () => {
+      const file = document.getElementById("file").files[0];
+      if (!file) { out.textContent = "Please choose a file first."; return; }
+      out.textContent = "Analyzing...";
+      try {
+        const result = await GroveLogic.analyzeFileAndGenerateQuiz(file);
+        out.textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        out.innerHTML = `<span class="err">${err.message}</span>`;
+      }
+    };
+
+    document.getElementById("fallback").onclick = () => {
+      out.textContent = JSON.stringify(GroveLogic.getFallbackQuiz(), null, 2);
+    };
+  </script>
+</body>
+</html>
