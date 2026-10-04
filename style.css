@@ -1,4 +1,4 @@
-/* GENERAL */
+/* BODY */
 .grove-login-body,
 .grove-main-body {
   margin: 0;
@@ -24,13 +24,31 @@
   100% { opacity: 1; transform: scale(1.05); }
 }
 
+/* FIRELIES */
+.grove-fireflies span {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #7cf9ff 0%, transparent 70%);
+  border-radius: 50%;
+  animation: firefly 10s linear infinite;
+}
+
+@keyframes firefly {
+  0% { transform: translate(0,0); opacity: 0.2; }
+  25% { transform: translate(20px,-30px); opacity: 1; }
+  50% { transform: translate(-10px,-60px); opacity: 0.6; }
+  75% { transform: translate(30px,-20px); opacity: 1; }
+  100% { transform: translate(0,0); opacity: 0.3; }
+}
+
 /* LOGIN CONTAINER */
 .grove-login-container {
   max-width: 420px;
   margin: 10vh auto;
   padding: 32px;
   border-radius: 24px;
-  background: rgba(10, 18, 40, 0.9);
+  background: rgba(10,18,40,0.9);
   border: 1px solid rgba(180,255,240,0.3);
   box-shadow: 0 24px 60px rgba(0,0,0,0.7);
   backdrop-filter: blur(16px);
@@ -40,55 +58,9 @@
 .grove-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 18px 32px;
   background: rgba(5,10,25,0.9);
   border-bottom: 1px solid rgba(180,255,240,0.2);
-}
-
-/* MAIN */
-.grove-main {
-  padding: 24px 32px;
-  max-width: 1100px;
-  margin: auto;
-}
-
-/* TITLES */
-.grove-title {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.grove-subtitle {
-  margin-top: 8px;
-  color: #c7e7ff;
-}
-
-.grove-welcome {
-  margin-top: 6px;
-  color: #e6d7ff;
-}
-
-/* INPUTS */
-.grove-label {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 14px;
-}
-
-.grove-input,
-.grove-textarea,
-.grove-input-file {
-  margin-top: 6px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(180,255,240,0.4);
-  background: rgba(5,10,25,0.9);
-  color: #fff;
-}
-
-.grove-textarea {
-  min-height: 80px;
 }
 
 /* BUTTONS */
@@ -103,6 +75,11 @@
 .grove-button-primary {
   background: linear-gradient(135deg, #3cf9b8, #7cf9ff);
   color: #04101a;
+}
+
+.grove-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(60,249,184,0.4);
 }
 
 .grove-button-secondary {
@@ -137,23 +114,5 @@
 .grove-like-button.liked {
   background: linear-gradient(135deg, #ffb347, #ff6b6b);
   color: #1b0505;
-}
-
-/* FIRELIES */
-.grove-fireflies span {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: radial-gradient(circle, #7cf9ff 0%, transparent 70%);
-  border-radius: 50%;
-  animation: firefly 10s linear infinite;
-}
-
-@keyframes firefly {
-  0% { transform: translate(0,0); opacity: 0.2; }
-  25% { transform: translate(20px,-30px); opacity: 1; }
-  50% { transform: translate(-10px,-60px); opacity: 0.6; }
-  75% { transform: translate(30px,-20px); opacity: 1; }
-  100% { transform: translate(0,0); opacity: 0.3; }
 }
 
