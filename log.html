@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enter the Enchanted Grove</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--night:#07130e;--moss:#1f4d37;--glow:#b8ff9a;--violet:#6b4aa0;--moon:#f3efd2;
+  --font:"Cormorant Garamond",Georgia,serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(ellipse at 50% 20%,#17382a 0%,var(--night) 70%);color:var(--moon);
+  font-family:var(--font);overflow:hidden;display:flex;align-items:center;justify-content:center}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.moon{position:fixed;top:7vh;right:12vw;width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fffbe0,var(--moon) 60%,#cfc99a);
+  box-shadow:0 0 60px 20px rgba(243,239,210,.35);animation:pulse 6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 90px 34px rgba(243,239,210,.5)}}
+.trees{position:fixed;left:0;right:0;bottom:0;height:34vh;pointer-events:none}
+.trees svg{width:100%;height:100%;display:block}
+.card{position:relative;z-index:2;width:min(400px,90vw);padding:38px 34px;border-radius:26px;
+  background:rgba(10,36,25,.72);backdrop-filter:blur(10px);border:1px solid rgba(184,255,154,.4);
+  box-shadow:0 0 50px rgba(120,255,160,.22),inset 0 0 30px rgba(107,74,160,.18);text-align:center;
+  animation:rise 1.4s cubic-bezier(.2,.9,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(40px) scale(.96)}}
+h1{font-size:2.3rem;margin:0 0 4px;font-weight:700;text-shadow:0 0 22px var(--glow)}
+.sub{margin:0 0 24px;opacity:.8;font-size:1.15rem}
+label{display:block;text-align:left;font-size:1.05rem;margin:14px 0 6px}
+input{width:100%;padding:13px 16px;border-radius:14px;border:1px solid rgba(184,255,154,.35);
+  background:rgba(0,0,0,.35);color:var(--moon);font:500 1.1rem var(--font);outline:none;transition:.25s}
+input:focus{border-color:var(--glow);box-shadow:0 0 18px rgba(184,255,154,.55)}
+button{margin-top:24px;width:100%;padding:14px;border:0;border-radius:999px;cursor:pointer;
+  font:700 1.2rem var(--font);color:#06210f;background:linear-gradient(135deg,var(--glow),#7be0b0);
+  box-shadow:0 0 24px rgba(184,255,154,.5);transition:transform .2s,box-shadow .2s}
+button:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 0 40px rgba(184,255,154,.8)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--moon);outline-offset:2px}
+button:disabled{opacity:.6;cursor:wait}
+.err{min-height:1.4em;margin:14px 0 0;color:#ffb3c1;font-size:1rem}
+.welcome{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 1s;
+  background:radial-gradient(circle at 50% 45%,#2a6b49,var(--night) 75%)}
+.welcome.on{opacity:1;pointer-events:all}
+.welcome h2{font-size:clamp(2.2rem,8vw,4.2rem);margin:0;text-shadow:0 0 30px var(--glow);
+  animation:float 3s ease-in-out infinite}
+.welcome p{opacity:.85;font-size:1.3rem}
+@keyframes float{50%{transform:translateY(-10px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="moon" aria-hidden="true"></div>
+<div class="trees" aria-hidden="true">
+<svg viewBox="0 0 1200 300" preserveAspectRatio="none">
+<path fill="#0b2418" d="M0 300V160l40-70 40 70 30-50 40 90 50-120 50 130 40-60 50 80 60-130 50 120 40-70 60 90 50-110 60 140 40-80 50 60 60-120 50 130 50-90 60 100 50-70 50 110 60-130 40 90 50-50 40 80 40-120 30 110V300z"/>
+<path fill="#06130c" d="M0 300V220l50-60 40 70 40-90 40 100 50-70 50 80 40-110 50 120 50-60 40 70 60-100 50 110 60-80 50 90 40-70 60 100 50-120 40 90 60-60 50 100 60-90 40 80 50-100 40 90 60-50V300z"/>
+</svg></div>
+ 
+<main class="card">
+  <h1>Enchanted Grove</h1>
+  <p class="sub">Step through the glowing gate</p>
+  <form id="f" autocomplete="on" novalidate>
+    <label for="u">Your name</label>
+    <input id="u" name="username" type="text" placeholder="e.g. Lisa" autocomplete="username" required>
+    <label for="p">Secret word</label>
+    <input id="p" name="password" type="password" placeholder="Whisper it" autocomplete="current-password" required>
+    <button id="b" type="submit">Enter the Grove</button>
+    <p class="err" id="e" role="alert"></p>
+  </form>
+</main>
+ 
+<div class="welcome" id="w" aria-live="polite">
+  <h2 id="wt"></h2>
+  <p>The fireflies have been waiting for you…</p>
+</div>
+ 
+<script>
+(function () {
+  "use strict";
+  var NAME_KEY = "groveUserName";
+  var HOME = "index.html"; /* page to open after login */
+ 
+  /* ---------- Fireflies ---------- */
+  var c = document.getElementById("fx"), x = c.getContext("2d"), W, H, P = [], burst = false;
+  function size() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  size(); addEventListener("resize", size);
+  for (var i = 0; i < 70; i++) P.push({
+    x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: 1.5 + Math.random() * 2.5,
+    a: Math.random() * 6.28, s: .2 + Math.random() * .5, t: Math.random() * 6.28,
+    h: Math.random() < .7 ? 95 : 275 });
+  function draw() {
+    x.clearRect(0, 0, W, H);
+    P.forEach(function (p) {
+      p.a += (Math.random() - .5) * .08; p.t += .03;
+      var sp = burst ? p.s * 6 : p.s;
+      p.x += Math.cos(p.a) * sp; p.y += Math.sin(p.a) * sp - (burst ? 1.2 : .15);
+      if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
+      var g = .35 + .65 * Math.abs(Math.sin(p.t));
+      x.beginPath(); x.arc(p.x, p.y, p.r, 0, 6.28);
+      x.fillStyle = "hsla(" + p.h + ",100%,75%," + g + ")";
+      x.shadowColor = "hsl(" + p.h + ",100%,70%)"; x.shadowBlur = 16; x.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+ 
+  /* ---------- Login ---------- */
+  var f = document.getElementById("f"), u = document.getElementById("u"),
+      p = document.getElementById("p"), b = document.getElementById("b"),
+      e = document.getElementById("e");
+ 
+  /* HOOK: if your server login exists, it is called here.
+     Replace the call below with your teammate's real login function if the name differs. */
+  async function doLogin(name, pass) {
+    var L = window.GroveLogic;
+    if (L && typeof L.login === "function") { await L.login(name, pass); }
+  }
+ 
+  function showWelcome(name) {
+    var w = document.getElementById("w");
+    document.getElementById("wt").textContent = "Welcome, " + name;
+    burst = true; w.classList.add("on");
+    setTimeout(function () { location.href = HOME; }, 2600);
+  }
+ 
+  f.addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+    var name = u.value.trim(), pass = p.value;
+    e.textContent = "";
+    if (!name || !pass) { e.textContent = "Please fill in your name and secret word."; return; }
+    b.disabled = true; b.textContent = "Opening the gate…";
+    try {
+      await doLogin(name, pass);
+      try { localStorage.setItem(NAME_KEY, name); sessionStorage.removeItem("groveWelcomed"); } catch (x1) {}
+      showWelcome(name);
+    } catch (err) {
+      e.textContent = "The gate stays closed. Check your name and secret word, then try again.";
+      b.disabled = false; b.textContent = "Enter the Grove";
+    }
+  });
+})();
+</script>
+</body>
+</html>
+ 

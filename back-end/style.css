@@ -1,218 +1,118 @@
-* {
-  box-sizing: border-box;
+/* BODY */
+.grove-login-body,
+.grove-main-body {
   margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Poppins", sans-serif;
+  color: #f5f3ff;
+  background: radial-gradient(circle at top, #2bffb8 0%, #0b1020 40%, #05060b 100%);
+  overflow-x: hidden;
 }
 
-body {
-  background: radial-gradient(circle at top, #10281a, #02040a);
-  color: #f5f5f5;
-  min-height: 100vh;
-  overflow: hidden;
-}
-
-/* Layout */
-.header {
-  text-align: center;
-  padding: 2rem 1rem 1rem;
-  position: relative;
-  z-index: 2;
-}
-
-.header h1 {
-  font-size: 2.4rem;
-  letter-spacing: 0.08em;
-}
-
-.header p {
-  margin-top: 0.5rem;
-  color: #cde8d4;
-}
-
-.main-layout {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  position: relative;
-  z-index: 2;
-}
-
-.card {
-  background: rgba(5, 20, 10, 0.85);
-  border: 1px solid #3fbf7f;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  width: 360px;
-  box-shadow: 0 0 25px rgba(0, 255, 150, 0.2);
-}
-
-.section-subtitle {
-  font-size: 0.9rem;
-  color: #b7e3c7;
-  margin-bottom: 1rem;
-}
-
-.highlight {
-  color: #ffe58a;
-}
-
-/* Quiz */
-#quizContainer button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  margin-bottom: 0.5rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.5rem;
-  border: none;
-  background: rgba(24, 70, 45, 0.9);
-  color: #f5f5f5;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-#quizContainer button:hover {
-  background: rgba(46, 120, 75, 0.95);
-  transform: translateY(-1px);
-}
-
-.score-text {
-  margin-top: 0.8rem;
-  font-size: 0.95rem;
-  color: #ffe58a;
-}
-
-/* Memory Tree */
-.tree-wrapper {
-  position: relative;
-  height: 260px;
-  margin-bottom: 1rem;
-  border-radius: 1rem;
-  background: radial-gradient(circle at bottom, #163322, #050b10);
-  overflow: hidden;
-}
-
-.tree-trunk {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 40px;
-  height: 120px;
-  background: linear-gradient(to top, #4b2e1a, #7a4a2a);
-  transform: translateX(-50%);
-  border-radius: 20px;
-}
-
-#fruitContainer {
-  position: absolute;
+/* GLOW */
+.grove-login-glow,
+.grove-background-glow {
+  position: fixed;
   inset: 0;
+  background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.08), transparent 60%),
+              radial-gradient(circle at 80% 100%, rgba(0,255,200,0.12), transparent 60%);
+  animation: groveGlow 12s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
-/* Fruits */
-.fruit {
+@keyframes groveGlow {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+/* FIRELIES */
+.grove-fireflies span {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #7cf9ff 0%, transparent 70%);
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(255, 255, 200, 0.9);
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  animation: firefly 10s linear infinite;
 }
 
-.fruit.gold {
-  background: #ffd86b;
+@keyframes firefly {
+  0% { transform: translate(0,0); opacity: 0.2; }
+  25% { transform: translate(20px,-30px); opacity: 1; }
+  50% { transform: translate(-10px,-60px); opacity: 0.6; }
+  75% { transform: translate(30px,-20px); opacity: 1; }
+  100% { transform: translate(0,0); opacity: 0.3; }
 }
 
-.fruit.blue {
-  background: #7fd3ff;
+/* LOGIN CONTAINER */
+.grove-login-container {
+  max-width: 420px;
+  margin: 10vh auto;
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(10,18,40,0.9);
+  border: 1px solid rgba(180,255,240,0.3);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+  backdrop-filter: blur(16px);
 }
 
-.fruit.green {
-  background: #9cff9c;
-}
-
-.fruit:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 1);
-}
-
-/* Note form */
-.note-form {
+/* HEADER */
+.grove-header {
   display: flex;
-  gap: 0.5rem;
+  justify-content: space-between;
+  padding: 18px 32px;
+  background: rgba(5,10,25,0.9);
+  border-bottom: 1px solid rgba(180,255,240,0.2);
 }
 
-.note-form input {
-  flex: 1;
-  padding: 0.5rem 0.7rem;
-  border-radius: 0.5rem;
-  border: 1px solid #3fbf7f;
-  background: rgba(5, 20, 10, 0.9);
-  color: #f5f5f5;
-}
-
-.note-form button {
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.5rem;
+/* BUTTONS */
+.grove-button {
   border: none;
-  background: #3fbf7f;
-  color: #041208;
-  font-weight: 600;
+  border-radius: 999px;
+  padding: 10px 18px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-/* Modal */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
+.grove-button-primary {
+  background: linear-gradient(135deg, #3cf9b8, #7cf9ff);
+  color: #04101a;
 }
 
-.modal.hidden {
-  display: none;
+.grove-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(60,249,184,0.4);
 }
 
-.modal-content {
-  background: #041208;
-  border-radius: 0.8rem;
-  padding: 1.2rem;
-  border: 1px solid #3fbf7f;
-  max-width: 320px;
+.grove-button-secondary {
+  background: rgba(10,20,40,0.9);
+  color: #e6faff;
+  border: 1px solid rgba(180,255,240,0.4);
 }
 
-.modal-content p {
-  margin-bottom: 0.8rem;
+/* SECTIONS */
+.grove-section {
+  margin-top: 24px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(8,16,32,0.9);
+  border: 1px solid rgba(180,255,240,0.25);
 }
 
-.modal-content button {
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.4rem;
-  border: none;
-  background: #3fbf7f;
-  color: #041208;
-  cursor: pointer;
+/* BLESSINGS */
+.grove-blessings-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 16px;
 }
 
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 0.8rem;
-  font-size: 0.8rem;
-  color: #9bbfa5;
-  position: relative;
-  z-index: 2;
+.grove-blessing-card {
+  padding: 14px;
+  border-radius: 16px;
+  background: radial-gradient(circle at top, rgba(60,249,184,0.12), rgba(5,10,25,0.95));
+  border: 1px solid rgba(124,249,255,0.35);
 }
 
-/* Firefly Canvas */
-#fireflyCanvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
+.grove-like-button.liked {
+  background: linear-gradient(135deg, #ffb347, #ff6b6b);
+  color: #1b0505;
 }
+
