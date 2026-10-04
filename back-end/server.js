@@ -9,9 +9,13 @@ const path = require("path");
 const { sessionMiddleware, authRouter, stateRouter, requireAuth, requirePage } = require("./auth");
 const { notesRouter } = require("./notes");
 const { createEnchantRouter } = require("./enchant");
+const { callGemini } = require("./gemini-call");
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+// 【可选】备用模型：主模型一直繁忙(503)时自动改用它。在 .env 里设置 GEMINI_FALLBACK_MODEL=模型名
+const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "";
+const MODELS = [MODEL, FALLBACK_MODEL];
 const PORT = process.env.PORT || 3000;
 
 if (!API_KEY) {
@@ -36,7 +40,7 @@ app.use("/api/state", express.json({ limit: "100kb" }), stateRouter);
 app.use("/api/notes", express.json({ limit: "10kb" }), notesRouter);
 
 // ---------- Polish with Magic: AI rewrites a message as fantasy prose (login required) ----------
-app.use("/api/enchant", express.json({ limit: "10kb" }), createEnchantRouter({ apiKey: API_KEY, model: MODEL }));
+app.use("/api/enchant", express.json({ limit: "10kb" }), createEnchantRouter({ apiKey: API_KEY, models: MODELS }));
 
 // ---------- Static files ----------
 // Only an allowlist is served; never the whole folder (that would expose .env and server.js).
@@ -62,16 +66,10 @@ app.post("/api/gemini", requireAuth, express.json({ limit: "25mb" }), async (req
     }
 
     // The model is fixed on the server so clients cannot pick expensive models
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-    const upstream = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
-      body: JSON.stringify({ contents, generationConfig })
-    });
-
-    const data = await upstream.json().catch(() => ({}));
-    res.status(upstream.status).json(data);
+    const result = await callGemini({ apiKey: API_KEY, models: MODELS, body: { contents, generationConfig } });
+    res.status(result.status).json(result.data);
   } catch (err) {
+    console.error("Gemini proxy failed:", err);
     res.status(502).json({ error: { message: `Proxy error: ${err.message}` } });
   }
 });

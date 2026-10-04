@@ -6,6 +6,7 @@
 // ==========================================
 const express = require("express");
 const { requireAuth } = require("./auth");
+const { callGemini } = require("./gemini-call");
 
 // 【可调整】AI 会从这个列表里给每条祝福选一个符文类型（runeType）。
 // 前端（UI 同学）需要为每个取值准备一种外观；增删取值后记得通知他们，并同步更新 README。
@@ -49,7 +50,7 @@ function sanitizeResult(parsed, fallbackWish) {
   return { paraphrase, prose, ...(runeType ? { runeType } : {}) };
 }
 
-function createEnchantRouter({ apiKey, model }) {
+function createEnchantRouter({ apiKey, models }) {
   const router = express.Router();
   router.use(requireAuth);
 
@@ -71,43 +72,29 @@ function createEnchantRouter({ apiKey, model }) {
     }
     lastCallAt.set(userId, now);
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-      const upstream = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: buildPrompt(wish, discipline) }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.9 }
-        }),
-        signal: controller.signal
-      });
-
-      const data = await upstream.json().catch(() => ({}));
-      if (!upstream.ok) {
-        return fail(res, 502, data.error?.message || `Gemini error (${upstream.status}).`);
+    const result = await callGemini({
+      apiKey,
+      models,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+      body: {
+        contents: [{ parts: [{ text: buildPrompt(wish, discipline) }] }],
+        generationConfig: { responseMimeType: "application/json", temperature: 0.9 }
       }
-
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) return fail(res, 502, "The magic fizzled. Please try again.");
-
-      let parsed;
-      try {
-        parsed = JSON.parse(rawText.replace(/```json|```/gi, "").trim());
-      } catch (err) {
-        return fail(res, 502, "The magic fizzled. Please try again.");
-      }
-
-      res.json(sanitizeResult(parsed, wish));
-    } catch (err) {
-      const message = err.name === "AbortError" ? "The magic took too long. Please try again." : "Could not reach the magic.";
-      fail(res, 502, message);
-    } finally {
-      clearTimeout(timer);
+    });
+    if (!result.ok) {
+      return fail(res, 502, result.data?.error?.message || `Gemini error (${result.status}).`);
     }
+
+    const rawText = result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) return fail(res, 502, "The magic fizzled. Please try again.");
+
+    let parsed;
+    try {
+      parsed = JSON.parse(rawText.replace(/```json|```/gi, "").trim());
+    } catch (err) {
+      return fail(res, 502, "The magic fizzled. Please try again.");
+    }
+    res.json(sanitizeResult(parsed, wish));
   });
 
   return router;
