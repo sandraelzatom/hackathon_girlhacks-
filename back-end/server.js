@@ -41,15 +41,14 @@ app.use("/api/enchant", express.json({ limit: "10kb" }), createEnchantRouter({ a
 // ---------- Static files ----------
 // Only an allowlist is served; never the whole folder (that would expose .env and server.js).
 // These files contain no secrets, so they are public.
-const PUBLIC_FILES = ["login.html", "test.html", "style.css", "logic.js", "config.js"];
+const PUBLIC_FILES = ["index.html", "style.css", "script.js", "grove-ui.js", "grove-api.js", "config.js", "login.html", "test.html"];
 PUBLIC_FILES.forEach((name) => {
   app.get(`/${name}`, (req, res) => res.sendFile(path.join(__dirname, name)));
 });
 
-// The main app page requires login
-app.get(["/", "/index.html"], requirePage, (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// The front page is public: it contains its own login screen. Everything that matters
+// (progress, blessings, Gemini) is protected by login on the API routes below.
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
 // Health check: the key itself is never returned
 app.get("/health", (req, res) => res.json({ ok: true, model: MODEL, keyLoaded: Boolean(API_KEY) }));

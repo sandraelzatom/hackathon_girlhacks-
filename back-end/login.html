@@ -2,37 +2,105 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Enchanted Grove – Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enchanted Grove - Login</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #f3f6f4; margin: 0; min-height: 100vh;
+           display: flex; align-items: center; justify-content: center; }
+    .card { background: #fff; width: 100%; max-width: 360px; padding: 28px; border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+    h1 { margin: 0 0 16px; font-size: 22px; text-align: center; }
+    .tabs { display: flex; margin-bottom: 16px; border-bottom: 1px solid #ddd; }
+    .tab { flex: 1; padding: 10px; background: none; border: none; cursor: pointer; font-size: 15px;
+           color: #777; border-bottom: 2px solid transparent; }
+    .tab.active { color: #1a7f37; border-bottom-color: #1a7f37; font-weight: 600; }
+    label { display: block; font-size: 13px; margin: 12px 0 4px; color: #444; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
+    button.submit { width: 100%; margin-top: 18px; padding: 11px; border: none; border-radius: 8px;
+                    background: #1a7f37; color: #fff; font-size: 15px; cursor: pointer; }
+    button.submit:disabled { opacity: .6; cursor: default; }
+    .msg { margin-top: 12px; min-height: 18px; font-size: 13px; color: #cf222e; text-align: center; }
+    .hint { font-size: 12px; color: #888; margin-top: 4px; }
+  </style>
 </head>
+<body>
+  <div class="card">
+    <h1>🌳 Enchanted Grove</h1>
 
-<body class="grove-login-body">
-  <div class="grove-login-glow"></div>
-
-  <div class="grove-login-container">
-    <h1 class="grove-title">🌙 Enchanted Grove</h1>
-    <p class="grove-subtitle">Step into the forest of starlight blessings.</p>
-
-    <form class="grove-login-form" action="/login" method="POST">
-      <label class="grove-label">
-        <span>Forest Name</span>
-        <input type="text" name="username" required placeholder="e.g., Lisa" class="grove-input" />
-      </label>
-
-      <label class="grove-label">
-        <span>Secret Pathword</span>
-        <input type="password" name="password" required placeholder="••••••••" class="grove-input" />
-      </label>
-
-      <button type="submit" class="grove-button grove-button-primary">
-        Enter the Grove ✨
-      </button>
-    </form>
-
-    <div class="grove-fireflies">
-      <span></span><span></span><span></span><span></span><span></span>
+    <div class="tabs">
+      <button class="tab active" id="tab-login" type="button">Log in</button>
+      <button class="tab" id="tab-register" type="button">Sign up</button>
     </div>
+
+    <form id="auth-form">
+      <label for="username">Username</label>
+      <input id="username" autocomplete="username" required />
+
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required />
+      <div class="hint" id="pw-hint" hidden>At least 8 characters.</div>
+
+      <button class="submit" id="submit" type="submit">Log in</button>
+      <div class="msg" id="msg"></div>
+    </form>
   </div>
+
+  <script>
+    // Where to go after login. Only same-site paths are allowed (prevents open redirects).
+    const nextParam = new URLSearchParams(window.location.search).get("next") || "";
+    const nextUrl = /^\/(?!\/)[^\\]*$/.test(nextParam) ? nextParam : "/index.html";
+
+    let mode = "login"; // "login" or "register"
+
+    const form = document.getElementById("auth-form");
+    const msg = document.getElementById("msg");
+    const submitBtn = document.getElementById("submit");
+    const pwInput = document.getElementById("password");
+
+    function setMode(next) {
+      mode = next;
+      document.getElementById("tab-login").classList.toggle("active", mode === "login");
+      document.getElementById("tab-register").classList.toggle("active", mode === "register");
+      submitBtn.textContent = mode === "login" ? "Log in" : "Create account";
+      document.getElementById("pw-hint").hidden = mode === "login";
+      pwInput.autocomplete = mode === "login" ? "current-password" : "new-password";
+      msg.textContent = "";
+    }
+
+    document.getElementById("tab-login").onclick = () => setMode("login");
+    document.getElementById("tab-register").onclick = () => setMode("register");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.textContent = "";
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/auth/${mode}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: pwInput.value
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          msg.textContent = data.error?.message || `Server error (${res.status}). Check the terminal where npm start is running.`;
+          return;
+        }
+        window.location.href = nextUrl; // success: go to the main app (or ?next= page)
+      } catch (err) {
+        msg.textContent = "Cannot reach the server. Is it running?";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // If already logged in, skip straight to the app
+    fetch("/api/auth/me").then((r) => { if (r.ok) window.location.href = nextUrl; });
+  </script>
 </body>
 </html>
-

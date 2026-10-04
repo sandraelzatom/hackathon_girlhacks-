@@ -192,6 +192,11 @@ function sanitizeState(input) {
   const notes = Array.isArray(input.notes) ? input.notes.slice(-MAX_NOTES) : [];
   return {
     starlightDew: Math.floor(clampNum(input.starlightDew, 0, 1e9, 0)),
+    conceptsMastered: Math.floor(clampNum(input.conceptsMastered, 0, 1e6, 0)),
+    blessingsHung: Math.floor(clampNum(input.blessingsHung, 0, 1e6, 0)),
+    milestones: Array.isArray(input.milestones)
+      ? input.milestones.filter((m) => typeof m === "string").map((m) => m.slice(0, 40)).slice(0, 100)
+      : [],
     notes: notes
       .filter((n) => n && typeof n === "object")
       .map((n, i) => ({

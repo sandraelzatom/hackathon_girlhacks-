@@ -1,68 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Enchanted Grove – Blessings</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Grove of Trials</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌳</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
+<body>
+<div id="aurora"></div><div id="fairy">🧚</div><div id="toast"></div><div id="moon"></div><div id="pines"></div><div id="fog"></div>
+<canvas id="fireflies"></canvas>
 
-<body class="grove-main-body">
-  <div class="grove-background-glow"></div>
+<nav id="nav" class="hidden">
+  <span class="logo">🌳 Grove of Trials</span>
+  <div class="links">
+    <a data-go="trials">Grove of Trials</a>
+    <a data-go="tree">Memory Tree</a>
+    <a data-go="music">Music Glade</a>
+    <a data-go="awaken">Awakening</a>
+    <a data-go="team">Team</a>
+  </div>
+  <div class="who"><span id="dew">✨ 0</span><span id="user"></span><button id="logout">Logout</button></div>
+</nav>
 
-  <header class="grove-header">
-    <div>
-      <h1 class="grove-title">🌲 Enchanted Grove</h1>
-      <p id="welcomeMessage" class="grove-welcome"></p>
-    </div>
+<!-- LOGIN / ENTRANCE -->
+<section id="login" class="page active">
+  <h1>The Grove of Trials</h1>
+  <p class="tag" id="tag">“Welcome to the Grove of Trials. Nourish the forest with knowledge, and illuminate each other with warmth.”</p>
+  <form id="loginForm" class="card">
+    <h2>Enter the Grove</h2>
+    <input id="name" placeholder="Your wanderer name" required maxlength="20">
+    <input id="pass" type="password" placeholder="Secret rune (password)" required minlength="3">
+    <button class="glow" type="submit">Step Inside ✦</button>
+    <button type="button" class="glow hidden" id="cont"></button>
+    <small>New wanderers are registered automatically.</small>
+    <small id="err"></small>
+  </form>
+  <button id="soundBtn" class="ghost">🔇 Forest sounds</button>
+</section>
 
-    <div>
-      <div class="grove-starlight">
-        Starlight Dew: <span id="starlightDewValue">0</span> ✨
-      </div>
-      <button class="grove-button grove-button-secondary" onclick="GroveLogic.logout()">
-        Log out 🌙
-      </button>
-    </div>
-  </header>
+<!-- TRIALS -->
+<section id="trials" class="page">
+  <h2 class="title">The Grove of Trials</h2>
+  <div id="setup" class="card wide">
+    <p>Paste your course notes. The grove's magic turns them into trials.</p>
+    <textarea id="notes" rows="7" placeholder="Paste notes here (full sentences work best)…"></textarea>
+    <div class="row"><button class="glow" id="gen">Conjure Questions ✦</button><button class="ghost" id="demo">Use sample scroll</button></div>
+  </div>
+  <div id="quiz" class="card wide hidden parchment">
+    <div class="row between"><span id="qn"></span><span id="combo"></span></div>
+    <h3 id="q"></h3><div id="opts"></div><p id="fb"></p>
+    <button class="glow hidden" id="next">Next ➜</button>
+  </div>
+</section>
 
-  <main class="grove-main">
+<!-- TREE -->
+<section id="tree" class="page">
+  <h2 class="title">The Memory Tree</h2>
+  <p class="sub">Beneath the ancient Banyan, every star is a wish. Touch one to read it, then hang your own.</p>
+  <div id="treeBox"><svg id="banyan" viewBox="0 0 400 420"><defs><linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1fa857"/><stop offset="1" stop-color="#8be04e"/></linearGradient><linearGradient id="cg2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7a1a"/><stop offset="1" stop-color="#ffb347"/></linearGradient><linearGradient id="cg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2fcf6a"/><stop offset=".5" stop-color="#ff9a2e"/><stop offset="1" stop-color="#7bdc4a"/></linearGradient><linearGradient id="tk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a05b"/><stop offset="1" stop-color="#4a2f17"/></linearGradient></defs><ellipse cx="200" cy="412" rx="190" ry="12" fill="#ffb34744"/><g stroke="url(#tk)" stroke-linecap="round" fill="none" class="trk2"><path d="M200 412C195 330 206 290 200 220" stroke-width="26"/><path d="M148 412C158 340 176 300 182 230" stroke-width="16"/><path d="M252 412C242 340 224 300 218 230" stroke-width="16"/></g><g id="roots" fill="none" stroke="#e0b27a" stroke-linecap="round"></g><g class="can" opacity=".92"><ellipse cx="110" cy="140" rx="112" ry="70" fill="url(#cg2)"/><ellipse cx="292" cy="140" rx="112" ry="70" fill="url(#cg1)"/><ellipse cx="200" cy="115" rx="170" ry="85" fill="url(#cg3)"/><ellipse cx="200" cy="68" rx="120" ry="52" fill="url(#cg1)" opacity=".85"/></g><g id="strings" fill="none" stroke="#fff3b0" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9"><path d="M30 130Q200 230 370 130"/><path d="M50 95Q200 180 350 95"/><path d="M90 160Q200 240 310 160"/></g><g id="lights"></g></svg><div id="fruits"></div></div>
+  <div class="card wide">
+    <textarea id="wish" rows="2" maxlength="140" placeholder="Make a wish or write encouragement for another student…"></textarea>
+    <div class="row"><button class="ghost" id="polish">🪄 Polish with Magic</button><button class="glow" id="hang">⭐ Hang My Wish on the Tree</button></div>
+  </div>
+</section>
 
-    <section class="grove-section">
-      <h2>Forest Blessings 🍃</h2>
-      <div id="blessingsList" class="grove-blessings-list"></div>
-    </section>
+<!-- AWAKENING -->
+<section id="awaken" class="page">
+  <h2 class="title">Forest Awakening</h2>
+  <div class="stats"><div><b id="sDew">0</b>Starlight Dew</div><div><b id="sMast">0</b>Concepts Mastered</div><div><b id="sBless">0</b>Blessings Hung</div></div>
+  <p class="sub" id="stage"></p>
+  <div id="meter"><i id="bar"></i></div>
+  <button class="ghost" id="share">Share my glow</button>
+</section>
 
-    <section class="grove-section">
-      <h2>Offer a New Blessing ✨</h2>
-      <textarea id="blessingText" class="grove-textarea" placeholder="Write a gentle blessing..."></textarea>
-      <input id="blessingAuthor" class="grove-input" type="text" placeholder="Your forest name" />
-      <button class="grove-button grove-button-primary" onclick="handleAddBlessing()">
-        Release Blessing 🍇
-      </button>
-    </section>
+<!-- MUSIC -->
+<section id="music" class="page">
+  <h2 class="title">The Music Glade</h2>
+  <p class="sub">Twenty living soundscapes, composed live by the forest itself. Close your eyes.</p>
+  <div id="tracks"></div>
+  <div class="row"><button class="ghost" id="pp">⏸ Pause</button><input type="range" id="vol" min="0" max="1" step=".01" value=".7"></div>
+  <p class="sub" id="now">Choose a melody…</p>
+</section>
 
-    <section class="grove-section">
-      <h2>Infuse Knowledge 📜</h2>
-      <input id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv" class="grove-input-file" />
-      <button class="grove-button grove-button-primary" onclick="handleFileUpload()">
-        Analyze & Grow Quiz 🌟
-      </button>
+<!-- TEAM -->
+<section id="team" class="page">
+  <h2 class="title">The Grove Keepers</h2>
+  <div class="stats"><div><b>Sandra Elza Thomas</b></div><div><b>Samiyah Harrison</b></div><div><b>Hannah</b></div></div>
+  <p class="sub">Our first hackathon. Theme: Enchanted Grove.<br>“Here, you aren't just gaining knowledge for yourself — you're leaving a spark of light to guide everyone else in the forest.”</p>
+</section>
 
-      <div id="uploadStatus" class="grove-status"></div>
-      <div id="analysisSummary" class="grove-summary"></div>
-      <div id="quizContainer" class="grove-quiz"></div>
-    </section>
-
-    <section class="grove-section">
-      <h2>Forest Energy Summary 🌌</h2>
-      Blessings shared: <span id="summaryBlessings">0</span><br />
-      Energy received: <span id="summaryEnergy">0</span> ✨
-    </section>
-
-  </main>
-
-  <script src="config.js"></script>
-  <script src="logic.js"></script>
-  <script src="grove-ui.js"></script>
+<div id="modal" class="hidden"><div class="card parchment"><p id="mText"></p><small id="mBy"></small><div class="row"><button class="glow" id="infuse">💛 Infuse Energy</button><button class="ghost" id="mClose">Close</button></div></div></div>
+<script src="config.js"></script>
+<script src="grove-api.js"></script>
+<script src="script.js"></script>
+<script src="grove-ui.js"></script>
 </body>
 </html>
