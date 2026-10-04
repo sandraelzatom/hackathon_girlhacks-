@@ -56,6 +56,17 @@
     <p>Built for Hackathon • Enchanted Grove Theme • Study, Support & Magic</p>
   </footer>
   <script src="config.js"></script>
+  <script src="config.js"></script>
+<script src="logic.js"></script>
+<script src="ui.js"></script>
+<script>
+  (async function () {
+    await GroveLogic.init();          // redirects to login if not logged in
+    renderGrove(GroveLogic.getState());
+    UI.start();                  // fireflies + "Welcome, Lisa" + logout button
+  })();
+</script>
+  
   <script src="script.js"></script>
 </body>
 </html>
