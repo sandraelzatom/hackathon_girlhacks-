@@ -100,7 +100,9 @@
     });
 
     // If already logged in, skip straight to the app
-    fetch("/api/auth/me").then((r) => { if (r.ok) window.location.href = nextUrl; });
-  </script>
+    fetch("/api/auth/me").then((r) => { if (r.ok) window.location.href = nextUrl; });<script src="grove-ui.js"></script>
+<script src="grove-ui.js"></script>
+<script>UI.fireflies();</script>
+   </script>
 </body>
 </html>
