@@ -10,16 +10,15 @@
   <div class="grove-background-glow"></div>
 
   <header class="grove-header">
-    <div class="grove-header-left">
+    <div>
       <h1 class="grove-title">🌲 Enchanted Grove</h1>
       <p id="welcomeMessage" class="grove-welcome"></p>
     </div>
 
-    <div class="grove-header-right">
+    <div>
       <div class="grove-starlight">
         Starlight Dew: <span id="starlightDewValue">0</span> ✨
       </div>
-
       <button class="grove-button grove-button-secondary" onclick="GroveLogic.logout()">
         Log out 🌙
       </button>
@@ -28,56 +27,42 @@
 
   <main class="grove-main">
 
-    <!-- Blessings -->
     <section class="grove-section">
       <h2>Forest Blessings 🍃</h2>
       <div id="blessingsList" class="grove-blessings-list"></div>
     </section>
 
-    <!-- Add Blessing -->
     <section class="grove-section">
       <h2>Offer a New Blessing ✨</h2>
-      <div class="grove-add-blessing">
-        <textarea id="blessingText" class="grove-textarea" placeholder="Write a gentle blessing..."></textarea>
-        <input id="blessingAuthor" class="grove-input" type="text" placeholder="Your forest name" />
-        <button class="grove-button grove-button-primary" onclick="handleAddBlessing()">
-          Release Blessing 🍇
-        </button>
-      </div>
+      <textarea id="blessingText" class="grove-textarea" placeholder="Write a gentle blessing..."></textarea>
+      <input id="blessingAuthor" class="grove-input" type="text" placeholder="Your forest name" />
+      <button class="grove-button grove-button-primary" onclick="handleAddBlessing()">
+        Release Blessing 🍇
+      </button>
     </section>
 
-    <!-- File Upload -->
     <section class="grove-section">
-      <h2>Infuse Knowledge into the Grove 📜</h2>
-      <p class="grove-note">Upload notes to grow a quiz.</p>
-
-      <div class="grove-upload">
-        <input id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv" class="grove-input-file" />
-        <button class="grove-button grove-button-primary" onclick="handleFileUpload()">
-          Analyze & Grow Quiz 🌟
-        </button>
-      </div>
+      <h2>Infuse Knowledge 📜</h2>
+      <input id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv" class="grove-input-file" />
+      <button class="grove-button grove-button-primary" onclick="handleFileUpload()">
+        Analyze & Grow Quiz 🌟
+      </button>
 
       <div id="uploadStatus" class="grove-status"></div>
       <div id="analysisSummary" class="grove-summary"></div>
       <div id="quizContainer" class="grove-quiz"></div>
     </section>
 
-    <!-- Forest Summary -->
-    <section class="grove-section grove-summary-section">
+    <section class="grove-section">
       <h2>Forest Energy Summary 🌌</h2>
-      <p>
-        Blessings shared: <span id="summaryBlessings">0</span><br />
-        Energy received: <span id="summaryEnergy">0</span> ✨
-      </p>
+      Blessings shared: <span id="summaryBlessings">0</span><br />
+      Energy received: <span id="summaryEnergy">0</span> ✨
     </section>
 
   </main>
 
-  <!-- Script order matters -->
   <script src="config.js"></script>
   <script src="logic.js"></script>
   <script src="grove-ui.js"></script>
 </body>
 </html>
-
