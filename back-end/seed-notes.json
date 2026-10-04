@@ -1,0 +1,14 @@
+[
+  { "author": "Moonlit Badger", "content": "Hard work today blooms into clarity tomorrow.", "fruitType": "blue", "position": { "x": 30, "y": 35 }, "likes": 7 },
+  { "author": "Starfall Fox", "content": "Breathe. You are prepared.", "fruitType": "gold", "position": { "x": 65, "y": 40 }, "likes": 12 },
+  { "author": "Lantern Owl", "content": "Hang in there! You're going to crush your finals tomorrow!", "fruitType": "gold", "position": { "x": 48, "y": 18 }, "likes": 9 },
+  { "author": "Willow Hare", "content": "Rest well tonight, you're doing amazing.", "fruitType": "green", "position": { "x": 22, "y": 52 }, "likes": 5 },
+  { "author": "Ember Moth", "content": "One more page, one more concept. Small steps still reach the summit.", "fruitType": "blue", "position": { "x": 75, "y": 22 }, "likes": 4 },
+  { "author": "Quiet Stag", "content": "It's okay to not understand it yet. Yet is a powerful word.", "fruitType": "green", "position": { "x": 40, "y": 58 }, "likes": 8 },
+  { "author": "Dewdrop Wren", "content": "Drink some water, stretch your shoulders, and then keep going. You've got this.", "fruitType": "gold", "position": { "x": 58, "y": 55 }, "likes": 3 },
+  { "author": "Mosshollow Bear", "content": "Every question you miss today is one you'll get right on the exam.", "fruitType": "blue", "position": { "x": 18, "y": 28 }, "likes": 6 },
+  { "author": "Glimmer Otter", "content": "You are not behind. You are exactly where you need to be to learn this.", "fruitType": "green", "position": { "x": 82, "y": 48 }, "likes": 10 },
+  { "author": "Twilight Finch", "content": "Stuck on a hard problem? Take a walk. The answer often finds you outside.", "fruitType": "gold", "position": { "x": 35, "y": 14 }, "likes": 2 },
+  { "author": "Silver Fawn", "content": "Proud of everyone burning the midnight oil. We'll all make it through together.", "fruitType": "blue", "position": { "x": 68, "y": 12 }, "likes": 11 },
+  { "author": "Amber Newt", "content": "Your effort matters more than your score. Keep glowing.", "fruitType": "green", "position": { "x": 52, "y": 38 }, "likes": 6 }
+]

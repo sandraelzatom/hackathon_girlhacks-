@@ -8,3 +8,8 @@ users.json.tmp
 users.json
 users.json.tmp
 .DS_Store
+users.json
+users.json.tmp
+notes.json
+notes.json.tmp
+.DS_Store

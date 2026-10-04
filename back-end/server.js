@@ -7,6 +7,8 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const { sessionMiddleware, authRouter, stateRouter, requireAuth, requirePage } = require("./auth");
+const { notesRouter } = require("./notes");
+const { createEnchantRouter } = require("./enchant");
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
@@ -29,6 +31,12 @@ app.use("/api/auth", express.json({ limit: "10kb" }), authRouter);
 
 // ---------- Per-user game progress (login required) ----------
 app.use("/api/state", express.json({ limit: "100kb" }), stateRouter);
+
+// ---------- Shared Memory Tree blessings (login required) ----------
+app.use("/api/notes", express.json({ limit: "10kb" }), notesRouter);
+
+// ---------- Polish with Magic: AI rewrites a message as fantasy prose (login required) ----------
+app.use("/api/enchant", express.json({ limit: "10kb" }), createEnchantRouter({ apiKey: API_KEY, model: MODEL }));
 
 // ---------- Static files ----------
 // Only an allowlist is served; never the whole folder (that would expose .env and server.js).

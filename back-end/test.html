@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Grove Test Page</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 780px; margin: 32px auto; padding: 0 16px; }
+    h3 { margin-top: 28px; }
+    button { padding: 8px 14px; margin: 4px 4px 0 0; cursor: pointer; }
+    input[type=text] { width: 70%; padding: 8px; }
+    pre { background: #f4f4f4; padding: 12px; border-radius: 8px; white-space: pre-wrap; min-height: 40px; }
+    .ok { color: #1a7f37; } .err { color: #cf222e; }
+    .row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <h2>Grove Test Page</h2>
+  <p id="status">Checking...</p>
+
+  <h3>1. Account &amp; progress</h3>
+  <button id="init">Load my progress (init)</button>
+  <button id="dew">+100 dew</button>
+  <button id="server">Show what the SERVER saved</button>
+  <button id="reset">Reset progress</button>
+  <button id="logout">Log out</button>
+  <pre id="out1">Click "Load my progress" first.</pre>
+
+  <h3>2. Gemini: analyze a file</h3>
+  <input type="file" id="file" accept=".pdf,.txt,.png,.jpg,.jpeg" />
+  <br />
+  <button id="run">Analyze &amp; generate quiz</button>
+  <pre id="out2">Nothing yet.</pre>
+
+  <h3>3. Quiz (combo + Mist Forest)</h3>
+  <button id="quizFallback">Start with the fallback quiz</button>
+  <button id="quizGemini">Start with the Gemini result above</button>
+  <button id="quizSkip">Skip Mist Forest</button>
+  <div id="quizBox"></div>
+  <pre id="out3">Start a quiz.</pre>
+
+  <h3>4. Memory Tree</h3>
+  <button id="load">Load blessings</button>
+  <button id="random">Random whisper</button>
+  <button id="stats">My blessing stats</button>
+  <div id="tree"></div>
+  <div style="margin-top:10px">
+    <input type="text" id="wish" maxlength="280" placeholder="Write a blessing..." />
+    <br />
+    <button id="enchant">Polish with Magic</button>
+    <button id="hang">Hang blessing (costs dew)</button>
+  </div>
+  <pre id="out4">Nothing yet.</pre>
+
+  <script src="config.js"></script>
+  <script src="logic.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const show = (el, data) => { el.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2); };
+    const fail = (el, err) => show(el, "Error: " + err.message);
+    let lastResult = null; // result of the last Gemini analysis
+
+    // Who is logged in?
+    GroveLogic.getCurrentUser().then((user) => {
+      if (user) {
+        $("status").innerHTML = '<span class="ok">Logged in as <b></b></span>';
+        $("status").querySelector("b").textContent = user.username;
+      } else {
+        $("status").innerHTML = '<span class="err">Not logged in.</span> <a href="/login.html?next=/test.html">Go to login</a>';
+      }
+    });
+
+    // ---- 1. Account & progress ----
+    $("init").onclick = async () => { show($("out1"), "Loading..."); show($("out1"), await GroveLogic.init()); };
+    $("dew").onclick = () => { GroveLogic.addDew(100); show($("out1"), GroveLogic.getState()); };
+    // Reads straight from the server (progress uploads 0.5s after a change)
+    $("server").onclick = async () => {
+      const res = await fetch("/api/state");
+      show($("out1"), res.ok ? await res.json() : "Error " + res.status + " (are you logged in?)");
+    };
+    $("reset").onclick = () => show($("out1"), GroveLogic.resetState());
+    $("logout").onclick = () => GroveLogic.logout();
+
+    // ---- 2. Gemini ----
+    $("run").onclick = async () => {
+      const file = $("file").files[0];
+      if (!file) { show($("out2"), "Please choose a file first."); return; }
+      show($("out2"), "Analyzing...");
+      try {
+        lastResult = await GroveLogic.analyzeFileAndGenerateQuiz(file);
+        show($("out2"), lastResult);
+      } catch (err) { fail($("out2"), err); }
+    };
+
+    // ---- 3. Quiz ----
+    function renderQuestion(lastAnswer) {
+      const box = $("quizBox");
+      box.textContent = "";
+      const q = GroveLogic.quiz.getCurrent();
+      if (!q) {
+        show($("out3"), { lastAnswer, summary: GroveLogic.quiz.getSummary() });
+        return;
+      }
+      const title = document.createElement("p");
+      title.textContent = `[${q.phase}] ${q.question}  (streak ${q.streak}, next x${q.multiplier}, +${q.pointsIfCorrect} dew, mist left ${q.mistRemaining})`;
+      box.appendChild(title);
+      q.options.forEach((opt, i) => {
+        const b = document.createElement("button");
+        b.textContent = opt;
+        b.onclick = () => renderQuestion(GroveLogic.quiz.answer(i));
+        box.appendChild(b);
+      });
+      show($("out3"), { lastAnswer, dewTotal: GroveLogic.getState().starlightDew });
+    }
+    $("quizFallback").onclick = () => { GroveLogic.quiz.start(GroveLogic.getFallbackQuiz()); renderQuestion(null); };
+    $("quizGemini").onclick = () => {
+      if (!lastResult) { show($("out3"), "Run an analysis in section 2 first."); return; }
+      GroveLogic.quiz.start(lastResult); renderQuestion(null);
+    };
+    $("quizSkip").onclick = () => { GroveLogic.quiz.skipMist(); renderQuestion(null); };
+
+    // ---- 4. Memory Tree ----
+    async function loadTree() {
+      const tree = $("tree");
+      try {
+        const notes = await GroveLogic.loadBlessings();
+        tree.textContent = "";
+        notes.forEach((n) => {
+          const row = document.createElement("div");
+          row.className = "row";
+          const text = document.createElement("span");
+          text.textContent = `${n.author}: ${n.content}  (${n.fruitType}, \u2665 ${n.likes})`;
+          const like = document.createElement("button");
+          like.textContent = n.likedByMe ? "Unlike" : "Infuse Energy";
+          like.onclick = async () => {
+            try { await GroveLogic.infuseEnergy(n.id); loadTree(); } catch (err) { fail($("out4"), err); }
+          };
+          row.append(like, text);
+          tree.appendChild(row);
+        });
+      } catch (err) { fail($("out4"), err); }
+    }
+    $("load").onclick = loadTree;
+    $("random").onclick = async () => { try { show($("out4"), await GroveLogic.getRandomBlessing()); } catch (err) { fail($("out4"), err); } };
+    $("stats").onclick = async () => { try { show($("out4"), await GroveLogic.getMyBlessingStats()); } catch (err) { fail($("out4"), err); } };
+    $("enchant").onclick = async () => {
+      show($("out4"), "Casting...");
+      try {
+        const magic = await GroveLogic.enchantWish($("wish").value, "Psychology");
+        $("wish").value = magic.paraphrase; // use the enchanted version
+        show($("out4"), magic);
+      } catch (err) { fail($("out4"), err); }
+    };
+    $("hang").onclick = async () => {
+      try {
+        const note = await GroveLogic.hangBlessing($("wish").value);
+        show($("out4"), { hung: note, dewLeft: GroveLogic.getState().starlightDew, cost: GroveLogic.getBlessingCost() });
+        loadTree();
+      } catch (err) { fail($("out4"), err); }
+    };
+  </script>
+</body>
+</html>
