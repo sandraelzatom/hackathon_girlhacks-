@@ -2,71 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>The Enchanted Grove</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enchanted Grove – Blessings</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <canvas id="fireflyCanvas"></canvas>
 
-  <header class="header">
-    <h1>🌿 The Enchanted Grove 🌿</h1>
-    <p>Turn your knowledge into light. Leave blessings on the Memory Tree.</p>
+<body class="grove-main-body">
+  <div class="grove-background-glow"></div>
+
+  <header class="grove-header">
+    <div class="grove-header-left">
+      <h1 class="grove-title">🌲 Enchanted Grove</h1>
+      <p id="welcomeMessage" class="grove-welcome"></p>
+    </div>
+
+    <div class="grove-header-right">
+      <div class="grove-starlight">
+        Starlight Dew: <span id="starlightDewValue">0</span> ✨
+      </div>
+
+      <button class="grove-button grove-button-secondary" onclick="GroveLogic.logout()">
+        Log out 🌙
+      </button>
+    </div>
   </header>
 
-  <main class="main-layout">
-    <!-- Quiz Section -->
-    <section class="card quiz-section">
-      <h2>The Grove of Trials</h2>
-      <p class="section-subtitle">
-        Answer enchanted questions to earn <span class="highlight">Starlight Dew</span>.
-      </p>
+  <main class="grove-main">
 
-      <div id="quizContainer"></div>
-      <p id="quizScore" class="score-text">Starlight Dew: 0</p>
+    <!-- Blessings -->
+    <section class="grove-section">
+      <h2>Forest Blessings 🍃</h2>
+      <div id="blessingsList" class="grove-blessings-list"></div>
     </section>
 
-    <!-- Memory Tree Section -->
-    <section class="card tree-section">
-      <h2>The Memory Tree</h2>
-      <p class="section-subtitle">
-        Read whispers from other travelers and hang your own blessing.
-      </p>
-
-      <div class="tree-wrapper">
-        <div class="tree-trunk"></div>
-        <div id="fruitContainer"></div>
-      </div>
-
-      <div class="note-form">
-        <input id="noteInput" type="text" placeholder="Leave a blessing..." />
-        <button id="addNoteBtn">Hang Blessing</button>
-      </div>
-
-      <div id="noteModal" class="modal hidden">
-        <div class="modal-content">
-          <p id="modalText"></p>
-          <button id="closeModalBtn">Close</button>
-        </div>
+    <!-- Add Blessing -->
+    <section class="grove-section">
+      <h2>Offer a New Blessing ✨</h2>
+      <div class="grove-add-blessing">
+        <textarea id="blessingText" class="grove-textarea" placeholder="Write a gentle blessing..."></textarea>
+        <input id="blessingAuthor" class="grove-input" type="text" placeholder="Your forest name" />
+        <button class="grove-button grove-button-primary" onclick="handleAddBlessing()">
+          Release Blessing 🍇
+        </button>
       </div>
     </section>
+
+    <!-- File Upload -->
+    <section class="grove-section">
+      <h2>Infuse Knowledge into the Grove 📜</h2>
+      <p class="grove-note">Upload notes to grow a quiz.</p>
+
+      <div class="grove-upload">
+        <input id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv" class="grove-input-file" />
+        <button class="grove-button grove-button-primary" onclick="handleFileUpload()">
+          Analyze & Grow Quiz 🌟
+        </button>
+      </div>
+
+      <div id="uploadStatus" class="grove-status"></div>
+      <div id="analysisSummary" class="grove-summary"></div>
+      <div id="quizContainer" class="grove-quiz"></div>
+    </section>
+
+    <!-- Forest Summary -->
+    <section class="grove-section grove-summary-section">
+      <h2>Forest Energy Summary 🌌</h2>
+      <p>
+        Blessings shared: <span id="summaryBlessings">0</span><br />
+        Energy received: <span id="summaryEnergy">0</span> ✨
+      </p>
+    </section>
+
   </main>
 
-  <footer class="footer">
-    <p>Built for Hackathon • Enchanted Grove Theme • Study, Support & Magic</p>
-  </footer>
+  <!-- Script order matters -->
   <script src="config.js"></script>
-  <script src="config.js"></script>
-<script src="logic.js"></script>
-<script src="ui.js"></script>
-<script>
-  (async function () {
-    await GroveLogic.init();          // redirects to login if not logged in
-    renderGrove(GroveLogic.getState());
-    UI.start();                  // fireflies + "Welcome, Lisa" + logout button
-  })();
-</script>
-  
-  <script src="script.js"></script>
+  <script src="logic.js"></script>
+  <script src="grove-ui.js"></script>
 </body>
 </html>
+
